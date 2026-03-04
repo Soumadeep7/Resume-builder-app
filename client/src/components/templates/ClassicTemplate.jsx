@@ -18,7 +18,7 @@ const ClassicTemplate = ({ data, accentColor }) => {
                     {data.personal_info?.full_name || "Your Name"}
                 </h1>
 
-                <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
                     {data.personal_info?.email && (
                         <div className="flex items-center gap-1">
                             <Mail className="size-4" />
@@ -44,11 +44,9 @@ const ClassicTemplate = ({ data, accentColor }) => {
                         </div>
                     )}
                     {data.personal_info?.website && (
-                        <div className="flex items-center gap-1 w-full justify-center mt-1">
-                            <Globe className="size-4 shrink-0" />
-                            <span className="break-all">
-                                {data.personal_info.website}
-                            </span>
+                        <div className="flex items-center gap-1">
+                            <Globe className="size-4" />
+                            <span className="break-all">{data.personal_info.website}</span>
                         </div>
                     )}
                 </div>
