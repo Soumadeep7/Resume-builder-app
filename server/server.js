@@ -14,19 +14,6 @@ const db = await connectDB();
 app.use(express.json());
 app.use(cors());
 
-/*app.get("/", async (req, res) => {
-  try {
-    const serverStatus = await db.command({ ping: 1 });
-
-    res.json({
-      message: "Server is live...",
-      mongoStatus: serverStatus
-    });
-  } catch (error) {
-    res.status(500).json({ error: "MongoDB error" });
-  }
-});*/
-
 app.get('/', (req, res)=>res.send("Server is live.."))
 app.use('/api/users', userRouter)
 app.use('/api/resumes', resumeRouter)

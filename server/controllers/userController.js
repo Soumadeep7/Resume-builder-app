@@ -50,6 +50,8 @@ export const registerUser = async (req, res)=>{
 
 export const loginUser = async (req, res) => {
     try {
+        console.log("LOGIN BODY:", req.body);
+
         const { email, password } = req.body;
 
         // Step 1: Validate input
