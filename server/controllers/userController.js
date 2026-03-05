@@ -49,37 +49,24 @@ export const registerUser = async (req, res)=>{
 //POST: /api/users/login
 
 export const loginUser = async (req, res) => {
-    try {
-        console.log("LOGIN BODY:", req.body);
+    console.log('LOGIN BODY:', req.body);
 
-        const { email, password } = req.body;
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ message: 'Email or password missing' });
 
-        // Step 1: Validate input
-        if (!email || !password) {
-            return res.status(400).json({ message: "Email and password are required" });
-        }
-
-        // Step 2: Find user
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "Invalid email or password" });
-        }
-
-        // Step 3: Compare password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid email or password" });
-        }
-
-        // Step 4: Return token
-        const token = generateToken(user._id);
-        user.password = undefined;
-
-        return res.status(200).json({ message: "Login successfully", token, user });
-
-    } catch (error) {
-        return res.status(400).json({ message: error.message });
+    const user = await User.findOne({ email });
+    if (!user) {
+        console.log('User not found:', email);
+        return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+        console.log('Password incorrect for:', email);
+        return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    res.json({ message: 'Login successful', token: generateToken(user._id) });
 };
 
 //Controller for getting user by id

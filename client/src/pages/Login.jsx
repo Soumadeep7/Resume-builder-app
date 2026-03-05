@@ -19,18 +19,22 @@ const Login = () => {
         password: ''
     })
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const {data} = await api.post(`/api/users/${state}`, formData)
-            dispatch(login(data))
-            localStorage.setItem('token', data.token)
-            toast.success(data.message)
-        } catch (error){
-            toast(error?.response?.data?.message || error.message)
-        }
+   const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+        // send only email & password for login
+        const body = state === "login" 
+            ? { email: formData.email, password: formData.password } 
+            : formData;
 
+        const { data } = await api.post(`/api/users/${state}`, body);
+        dispatch(login(data));
+        localStorage.setItem('token', data.token);
+        toast.success(data.message);
+    } catch (error) {
+        toast(error?.response?.data?.message || error.message);
     }
+};
 
     const handleChange = (e) => {
         const { name, value } = e.target
