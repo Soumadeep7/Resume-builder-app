@@ -26,7 +26,7 @@ const SkillsForm = ({data, onChange}) => {
     <div className='space-y-4'>
         <div>
             <h3 className='flex items-center gap-2 text-lg font-semibold text-gray-900'> Skills </h3>
-            <p className='text-sm test-gray-500'> Add your techical and soft skills</p>
+            <p className='text-sm test-gray-500'> Add your technical and soft skills</p>
         </div>
 
         <div className="flex gap-2">

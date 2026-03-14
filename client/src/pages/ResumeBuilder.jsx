@@ -15,6 +15,8 @@ import { useSelector } from 'react-redux'
 import api from '../configs/api'
 import toast from 'react-hot-toast'
 
+
+
 const ResumeBuilder = () => {
 
   const {resumeId} = useParams()
@@ -109,9 +111,13 @@ const changeResumeVisibility = async () => {
     }
   }
 
-  const downloadResume = ()=>{
+ const downloadResume = () => {
+  window.scrollTo(0, 0);
+
+  setTimeout(() => {
     window.print();
-  }
+  }, 200);
+};
 
   const saveResumeData = async ()=>{
     try{
@@ -252,8 +258,8 @@ const changeResumeVisibility = async () => {
                   {resumeData.public ? 'Public' : 'Private'}
                 </button>
 
-                <button onClick={downloadResume} className='flex items-center gap-2 px-6 py-2 text-xs bg-gradient-to-br from-green-100 to-green
-                  -200 text-green-600 rounded-lg ring-green-300 hover:ring transition-colors'>
+                <button onClick={downloadResume} className='flex items-center gap-2 px-6 py-2 text-xs bg-gradient-to-br from-green-100 
+                to-green-200 text-green-600 rounded-lg ring-green-300 hover:ring transition-colors'>
                   <DownloadIcon className='size-4' /> Download</button>
               </div>         
             </div>

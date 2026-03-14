@@ -3,28 +3,51 @@ import ClassicTemplate from './templates/ClassicTemplate'
 import MinimalTemplate from './templates/MinimalTemplate'
 import MinimalImageTemplate from './templates/MinimalImageTemplate'
 import ModernTemplate from './templates/ModernTemplate'
+import ModernSidebarTemplate from './templates/ModernSideBarTemplate'
+import CorporateTemplate from './templates/CorporateTemplate'
+import CreativeCardTemplate from './templates/CreativeCardTemplate'
 
 const ResumePreview = ({data, template, accentColor, classes = ""}) => {
+
+    const cleanedData = {
+            ...data,
+            experience: data?.experience?.filter(
+            exp => exp.company || exp.position || exp.description
+        ) || []
+    };
 
     const renderTemplate = ()=>{
         switch (template) {
             case "modern":
-                return <ModernTemplate data={data} accentColor={accentColor} />;
+                return <ModernTemplate data={cleanedData} accentColor={accentColor} />;
             
             case "minimal":
-                return <MinimalTemplate data={data} accentColor={accentColor} />;
+                return <MinimalTemplate data={cleanedData} accentColor={accentColor} />;
                 
             case "minimal-image":
-                return <MinimalImageTemplate data={data} accentColor={accentColor} />;
+                return <MinimalImageTemplate data={cleanedData} accentColor={accentColor} />;
+
+            case "modern-sidebar":
+                return <ModernSidebarTemplate data={cleanedData} accentColor={accentColor} />
+
+            case "corporate":
+                return <CorporateTemplate data={cleanedData} accentColor={accentColor} />
+
+            case "creative-card":
+                return <CreativeCardTemplate data={cleanedData} accentColor={accentColor} />
         
             default:
-                return <ClassicTemplate data={data} accentColor={accentColor} />;
+                return <ClassicTemplate data={cleanedData} accentColor={accentColor} />;
         }
     }
 
   return (
     <div className='w-full bg-gray-100'>
-        <div id="resume-preview" className={"border border-gray-200 print:shadow-none print:border-none " + classes}>
+        <div
+  id="resume-preview"
+  style={{ userSelect: "text" }}
+  className={"border border-gray-200 mx-auto w-[794px] bg-white " + classes}
+>
             {renderTemplate()}
 
         </div>
@@ -32,33 +55,43 @@ const ResumePreview = ({data, template, accentColor, classes = ""}) => {
         <style >
             {`
             @page {
-                size: letter;
-                margin: 0;
-            }
-            @media print {
-                html, body {
-                width: 8.5in;
-                height: 11in;
-                overflow: hidden;
-                }
-                body * {
-                    visibility: hidden;
-                }
-                #resume-preview, #resume-preview * {
-                    visibility: visible;
-                }
-                #resume-preview {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                    height: auto;
-                    margin: 0;
-                    padding: 0;
-                    box-shadow: none !important;
-                    border: none !important;
-                }
-            }
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #resume-preview,
+  #resume-preview * {
+    visibility: visible;
+  }
+
+  #resume-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 794px;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
             `}
         </style>
 

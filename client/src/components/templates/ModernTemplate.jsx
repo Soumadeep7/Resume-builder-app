@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Linkedin, Globe } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Globe, Github } from "lucide-react";
 
 const ModernTemplate = ({ data, accentColor }) => {
 	const formatDate = (dateStr) => {
@@ -13,8 +13,8 @@ const ModernTemplate = ({ data, accentColor }) => {
 	return (
 		<div className="max-w-4xl mx-auto bg-white text-gray-800">
 			{/* Header */}
-			<header className="p-8 text-white" style={{ backgroundColor: accentColor }}>
-				<h1 className="text-4xl font-light mb-3">
+			<header className="p-2 text-white" style={{ backgroundColor: accentColor }}>
+				<h1 className="text-4xl font-light mb-2">
 					{data.personal_info?.full_name || "Your Name"}
 				</h1>
 
@@ -52,11 +52,11 @@ const ModernTemplate = ({ data, accentColor }) => {
 				</div>
 			</header>
 
-			<div className="p-8">
+			<div className="p-5">
 				{/* Professional Summary */}
 				{data.professional_summary && (
-					<section className="mb-8">
-						<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
+					<section className="mb-2">
+						<h2 className="text-2xl font-light mb-2 pb-2 border-b border-gray-200">
 							Professional Summary
 						</h2>
 						<p className="text-gray-700 ">{data.professional_summary}</p>
@@ -65,8 +65,8 @@ const ModernTemplate = ({ data, accentColor }) => {
 
 				{/* Experience */}
 				{data.experience && data.experience.length > 0 && (
-					<section className="mb-8">
-						<h2 className="text-2xl font-light mb-6 pb-2 border-b border-gray-200">
+					<section className="mb-2">
+						<h2 className="text-2xl font-light mb-2 pb-1 border-b border-gray-200">
 							Experience
 						</h2>
 
@@ -96,8 +96,8 @@ const ModernTemplate = ({ data, accentColor }) => {
 
 				{/* Projects */}
 				{data.project && data.project.length > 0 && (
-					<section className="mb-8">
-						<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
+					<section className="mb-2">
+						<h2 className="text-2xl font-light mb-2 pb-2 border-b border-gray-200">
 							Projects
 						</h2>
 
@@ -125,32 +125,43 @@ const ModernTemplate = ({ data, accentColor }) => {
 				<div className="grid sm:grid-cols-2 gap-8">
 					{/* Education */}
 					{data.education && data.education.length > 0 && (
-						<section>
-							<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
-								Education
-							</h2>
+		<section>
+			<h2 className="text-2xl font-light mb-2 pb-2 border-b border-gray-200">
+				Education
+			</h2>
 
-							<div className="space-y-4">
-								{data.education.map((edu, index) => (
-									<div key={index}>
-										<h3 className="font-semibold text-gray-900">
-											{edu.degree} {edu.field && `in ${edu.field}`}
-										</h3>
-										<p style={{ color: accentColor }}>{edu.institution}</p>
-										<div className="flex justify-between items-center text-sm text-gray-600">
-											<span>{formatDate(edu.graduation_date)}</span>
-											{edu.gpa && <span>GPA: {edu.gpa}</span>}
-										</div>
-									</div>
-								))}
-							</div>
-						</section>
-					)}
+			<div className="space-y-4">
+				{data.education.map((edu, index) => (
+					<div key={index}>
+						<h3 className="font-semibold text-gray-900">
+							{edu.degree} {edu.field && `in ${edu.field}`}
+						</h3>
+
+						<p style={{ color: accentColor }}>
+							{edu.institution}
+						</p>
+
+						{/* GPA under institution */}
+						{edu.gpa && (
+							<p className="text-sm text-gray-600">
+								GPA: {edu.gpa}
+							</p>
+						)}
+
+						{/* Date below GPA */}
+						<p className="text-sm text-gray-500">
+							{formatDate(edu.graduation_date)}
+						</p>
+					</div>
+				))}
+			</div>
+		</section>
+	)}
 
 					{/* Skills */}
 					{data.skills && data.skills.length > 0 && (
 						<section>
-							<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
+							<h2 className="text-2xl font-light mb-2 pb-2 border-b border-gray-200">
 								Skills
 							</h2>
 

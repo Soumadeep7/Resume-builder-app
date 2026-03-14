@@ -11,9 +11,9 @@ const ClassicTemplate = ({ data, accentColor }) => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-8 bg-white text-gray-800 leading-relaxed">
+        <div className="max-w-4xl mx-auto p-5 bg-white text-gray-800 leading-relaxed">
             {/* Header */}
-            <header className="text-center mb-8 pb-6 border-b-2" style={{ borderColor: accentColor }}>
+            <header className="text-center mb-4 pb-3 border-b-2" style={{ borderColor: accentColor }}>
                 <h1 className="text-3xl font-bold mb-2" style={{ color: accentColor }}>
                     {data.personal_info?.full_name || "Your Name"}
                 </h1>
@@ -38,24 +38,24 @@ const ClassicTemplate = ({ data, accentColor }) => {
                         </div>
                     )}
                     {data.personal_info?.linkedin && (
-                        <div className="flex items-center gap-1">
-                            <Linkedin className="size-4" />
-                            <span className="break-all">{data.personal_info.linkedin}</span>
-                        </div>
-                    )}
-                    {data.personal_info?.website && (
-                        <div className="flex items-center gap-1">
-                            <Globe className="size-4" />
-                            <span className="break-all">{data.personal_info.website}</span>
-                        </div>
-                    )}
+						<a target="_blank" href={data.personal_info?.linkedin} className="flex items-center gap-2">
+							<Linkedin className="size-4" />
+							<span className="break-all text-xs">{data.personal_info.linkedin.split("https://www.")[1] ? data.personal_info.linkedin.split("https://www.")[1] : data.personal_info.linkedin}</span>
+						</a>
+					)}
+					{data.personal_info?.website && (
+						<a target="_blank" href={data.personal_info?.website} className="flex items-center gap-2">
+							<Globe className="size-4" />
+							<span className="break-all text-xs">{data.personal_info.website.split("https://")[1] ? data.personal_info.website.split("https://")[1] : data.personal_info.website}</span>
+						</a>
+					)}
                 </div>
             </header>
 
             {/* Professional Summary */}
             {data.professional_summary && (
-                <section className="mb-6">
-                    <h2 className="text-xl font-semibold mb-3" style={{ color: accentColor }}>
+                <section className="mb-2">
+                    <h2 className="text-xl font-semibold mb-2" style={{ color: accentColor }}>
                         PROFESSIONAL SUMMARY
                     </h2>
                     <p className="text-gray-700 leading-relaxed">{data.professional_summary}</p>
@@ -64,8 +64,8 @@ const ClassicTemplate = ({ data, accentColor }) => {
 
             {/* Experience */}
             {data.experience && data.experience.length > 0 && (
-                <section className="mb-6">
-                    <h2 className="text-xl font-semibold mb-4" style={{ color: accentColor }}>
+                <section className="mb-2">
+                    <h2 className="text-xl font-semibold mb-2" style={{ color: accentColor }}>
                         PROFESSIONAL EXPERIENCE
                     </h2>
 
@@ -94,8 +94,8 @@ const ClassicTemplate = ({ data, accentColor }) => {
 
             {/* Projects */}
             {data.project && data.project.length > 0 && (
-                <section className="mb-6">
-                    <h2 className="text-xl font-semibold mb-4" style={{ color: accentColor }}>
+                <section className="mb-3">
+                    <h2 className="text-xl font-semibold mb-2" style={{ color: accentColor }}>
                         PROJECTS
                     </h2>
 
@@ -114,8 +114,8 @@ const ClassicTemplate = ({ data, accentColor }) => {
 
             {/* Education */}
             {data.education && data.education.length > 0 && (
-                <section className="mb-6">
-                    <h2 className="text-xl font-semibold mb-4" style={{ color: accentColor }}>
+                <section className="mb-2">
+                    <h2 className="text-xl font-semibold mb-1" style={{ color: accentColor }}>
                         EDUCATION
                     </h2>
 
@@ -140,8 +140,8 @@ const ClassicTemplate = ({ data, accentColor }) => {
 
             {/* Skills */}
             {data.skills && data.skills.length > 0 && (
-                <section className="mb-6">
-                    <h2 className="text-xl font-semibold mb-4" style={{ color: accentColor }}>
+                <section className="mb-3">
+                    <h2 className="text-xl font-semibold mb-2" style={{ color: accentColor }}>
                         CORE SKILLS
                     </h2>
 

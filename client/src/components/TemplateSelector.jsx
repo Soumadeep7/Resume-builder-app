@@ -25,6 +25,22 @@ const TemplateSelector = ({seletedTemplate, onChange}) => {
             name: "Minimal",
             preview: "Ultra-clean design that puts your content front of center"
         },
+        {
+            id: "modern-sidebar",
+            name: "Modern Sidebar",
+            preview: "Professional layout with colored sidebar"
+        },
+        {
+            id: "corporate",
+            name: "Corporate",
+            preview: "Corporate Layout"
+        },
+        {
+            id: "creative-card",
+            name: "Creative-Card",
+            preview: "Creative Layout"
+        },
+        
     ]
   return (
     <div className='relative'>
@@ -36,7 +52,7 @@ const TemplateSelector = ({seletedTemplate, onChange}) => {
             <div className='absolute top-full w-xs p-3 mt-2 space-y-3 z-10 bg-white rounded-md border border-gray-200 shadow-sm'>
                 {templates.map((template) => (
                     <div key={template.id} onClick={()=> {onChange(template.id); setIsOpen(false)}}
-                    className={`relative p-3 border rounded-md cursor -pointer transition-all ${seletedTemplate 
+                    className={`relative p-3 border rounded-md cursor-pointer transition-all ${seletedTemplate 
                         === template.id ? "border-blue-400 bg-blue-100" : "border-gray-300 hover:border-gray-400 hover:bg-gray-100"
                     }`}>
                         {seletedTemplate === template.id && (

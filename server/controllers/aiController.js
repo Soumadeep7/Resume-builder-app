@@ -90,7 +90,7 @@ export const uploadResume = async (req, res) => {
         skills: [{ type: String}],
         personal_info: {
             image: {type: String, default: ''},
-            ull_name: {type: String, default: ''},
+            full_name: {type: String, default: ''},
             profession: {type: String, default: ''},
             email: {type: String, default: ''},
             phone: {type: String, default: ''},
@@ -126,25 +126,17 @@ export const uploadResume = async (req, res) => {
         ],
         }`;
 
-        const response =  await ai.chat.completions.create({
-            model: process.env.OPENAI_MODEL,
-            messages: [
-                {  role: "system",
-                   content: systemPrompt },
-                {
-                    role: "user",
-                    content: userPrompt,
-                },
-            ],
+        const response = await ai.responses.create({
+            model: "gpt-5-nano",
+            input: `${systemPrompt}\n\n${userPrompt}`,
+        });
 
-            response_format: {type: 'json_object'}
-        })
+        const extractedData = response.output_text;
+        const parseData = JSON.parse(extractedData);
 
-        const extractedData = response.choices[0].message.content;
-        const parseData = JSON.parse(extractedData)
-        const newResume = await Resume.create({userId, title, ...parseData})
+        const newResume = await Resume.create({ userId, title, ...parseData });
 
-        res.json({resumeId: newResume._id})
+        res.json({ resumeId: newResume._id });
 
     }catch (error){
 
