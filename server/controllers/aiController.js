@@ -126,20 +126,31 @@ export const uploadResume = async (req, res) => {
         ],
         }`;
 
+        console.log("Upload Resume Body:", req.body);
+
         const response = await ai.responses.create({
             model: "gpt-5-nano",
             input: `${systemPrompt}\n\n${userPrompt}`,
         });
 
+        console.log("OpenAI response received");
+
         const extractedData = response.output_text;
         const parseData = JSON.parse(extractedData);
+
+        // Fix skills format
+        if (Array.isArray(parseData.skills)) {
+            parseData.skills = parseData.skills.map(skill =>
+                typeof skill === "string" ? skill : skill.type || ""
+            );
+        }
 
         const newResume = await Resume.create({ userId, title, ...parseData });
 
         res.json({ resumeId: newResume._id });
 
     }catch (error){
-
+        console.log("FULL ERROR:", error);
         return res.status(400).json({message: error.message})
     }
     
