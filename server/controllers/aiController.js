@@ -7,67 +7,64 @@ import ai from "../configs/ai.js";
 export const enhanceProfessionalSummary = async (req, res) => {
   try {
     const { userContent } = req.body;
+
     if (!userContent) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const response = await ai.chat.completions.create({
-      model: "gpt-5-nano", // Use gpt-5-nano for now
-      messages: [
-        {
-          role: "system",
-          content: `You are an expert in resume writing. 
-          Enhance the professional summary of a resume in 1-2 sentences. 
-          Highlight key skills, experience, and career objectives. 
-          Make it compelling and ATS-friendly. Return only text.`
-        },
-        { role: "user", content: userContent }
-      ]
+    const response = await ai.responses.create({
+      model: "gpt-5-nano",
+      input: `You are an expert resume writer.
+
+Enhance the following professional summary in 1-2 sentences.
+Highlight key skills, experience, and career objectives.
+Make it compelling and ATS-friendly.
+
+Professional Summary:
+${userContent}`
     });
 
-    const enhancedContent = response.choices[0].message.content;
+    const enhancedContent = response.output_text;
+
     return res.status(200).json({ enhancedContent });
+
   } catch (error) {
     console.log("FULL ERROR:", error);
     return res.status(500).json({ message: error.message });
   }
 };
 
-
 //controller for enhancing resume's job description
 //POST: /api/ai/enhance-job-decs
 
 export const enhanceJobDescription = async (req, res) => {
-    try{
-        const {userContent} = req.body;
+  try {
+    const { userContent } = req.body;
 
-        if(!userContent){
-            return res.status(400).json({message: 'Missing required fields'})
-        }
-
-        const response =  await ai.chat.completions.create({
-            model: "gpt-5-nano",
-            messages: [
-                {  role: "system",
-                   content: `You are an expert in resume writing.Your task is to enhance the job description
-                    of a resume. The job description  should be only in 1-2 sentences also highlighting key responsibilites, 
-                    and achievements. Use action verbs and quantifiable results where possible.
-                    Make it ATS-friendly. and only return text no options or anything else.` },
-                {
-                    role: "user",
-                    content: userContent,
-                },
-            ],
-        })
-        const enhancedContent = response.choices[0].message.content;
-        return res.status(200).json({enhancedContent})
-    }catch (error){
-
-        return res.status(400).json({message: error.message})
+    if (!userContent) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
-    
-}
 
+    const response = await ai.responses.create({
+      model: "gpt-5-nano",
+      input: `You are an expert resume writer.
+Enhance this job description in 1-2 sentences.
+Highlight key responsibilities and achievements.
+Use action verbs and make it ATS-friendly.
+
+Job Description:
+${userContent}`
+    });
+
+    const enhancedContent = response.output_text;
+
+    return res.status(200).json({ enhancedContent });
+
+  } catch (error) {
+    console.log("FULL ERROR:", error);
+    return res.status(400).json({ message: error.message });
+  }
+};
 //controller for enhancing resume to the database
 //POST: /api/ai/upload-resume
 
@@ -85,44 +82,45 @@ export const uploadResume = async (req, res) => {
         const userPrompt = `extract data from this resume: ${resumeText}
         
         Provide data in the following JSON format with no additional text before or after:
-        {
-        professional_summary: {type: String, default: ''},
-        skills: [{ type: String}],
-        personal_info: {
-            image: {type: String, default: ''},
-            full_name: {type: String, default: ''},
-            profession: {type: String, default: ''},
-            email: {type: String, default: ''},
-            phone: {type: String, default: ''},
-            location: {type: String, default: ''},
-            linkedin: {type: String, default: ''},
-            website: {type: String, default: ''},
-        },
-        experience: [
-            {
-                comapany: {type: String},
-                position: {type: String},
-                start_date: {type: String},
-                end_date: {type: String},
-                description: {type: String},
-                is_current: {type: Boolean},
-            }
-        ],
-        project: [
-            {
-                name: { type: String},
-                type: {type: String},
-                description: {type: String},
-            }
-        ],
-        education: [
-            {
-                institution: {type: String},
-                degree: {type: String},
-                field: {type: String},
-                graduation_date: {type: String},
-                gpa: {type: String},
-            }
+
+{
+  "professional_summary": "",
+  "skills": [],
+  "personal_info": {
+    "image": "",
+    "full_name": "",
+    "profession": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "linkedin": "",
+    "website": ""
+  },
+  "experience": [
+    {
+      "company": "",
+      "position": "",
+      "start_date": "",
+      "end_date": "",
+      "description": "",
+      "is_current": false
+    }
+  ],
+  "project": [
+    {
+      "name": "",
+      "type": "",
+      "description": ""
+    }
+  ],
+  "education": [
+    {
+      "institution": "",
+      "degree": "",
+      "field": "",
+      "graduation_date": "",
+      "gpa": ""
+    }
         ],
         }`;
 
@@ -131,23 +129,46 @@ export const uploadResume = async (req, res) => {
         const response = await ai.responses.create({
             model: "gpt-5-nano",
             input: `${systemPrompt}\n\n${userPrompt}`,
+            response_format: { type: "json_object" }
         });
 
         console.log("OpenAI response received");
 
         const extractedData = response.output_text;
-        const parseData = JSON.parse(extractedData);
 
-        // Fix skills format
-        if (Array.isArray(parseData.skills)) {
-            parseData.skills = parseData.skills.map(skill =>
-                typeof skill === "string" ? skill : skill.type || ""
-            );
+        let parseData;
+
+        try {
+            parseData = JSON.parse(extractedData);
+        } catch (err) {
+            console.log("JSON Parse Error:", extractedData);
+            return res.status(500).json({ message: "AI returned invalid JSON" });
         }
+        // Fix skills if AI returns string instead of array
+        if (typeof parseData.skills === "string") {
+        try {
+            parseData.skills = JSON.parse(parseData.skills);
+        } catch {
+            parseData.skills = [];
+        }
+    }
 
-        const newResume = await Resume.create({ userId, title, ...parseData });
+    // Convert objects → strings
+    if (Array.isArray(parseData.skills)) {
+        parseData.skills = parseData.skills.map(skill => {
+            if (typeof skill === "string") return skill;
+            if (typeof skill === "object" && skill.type) return skill.type;
+            return "";
+        }).filter(Boolean);
+    }
 
-        res.json({ resumeId: newResume._id });
+    const newResume = await Resume.create({
+        userId,
+        title,
+        ...parseData
+    });
+
+    res.json({ resumeId: newResume._id });
 
     }catch (error){
         console.log("FULL ERROR:", error);
