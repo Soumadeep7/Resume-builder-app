@@ -127,9 +127,13 @@ export const uploadResume = async (req, res) => {
         console.log("Upload Resume Body:", req.body);
 
         const response = await ai.responses.create({
-            model: "gpt-5-nano",
-            input: `${systemPrompt}\n\n${userPrompt}`,
-            response_format: { type: "json_object" }
+          model: "gpt-5-nano",
+          input: `${systemPrompt}\n\n${userPrompt}`,
+          text: {
+            format: {
+              type: "json_object"
+            }
+          }
         });
 
         console.log("OpenAI response received");
@@ -172,7 +176,7 @@ export const uploadResume = async (req, res) => {
 
     }catch (error){
         console.log("FULL ERROR:", error);
-        return res.status(400).json({message: error.message})
+        return res.status(500).json({message: error.message})
     }
     
 }
