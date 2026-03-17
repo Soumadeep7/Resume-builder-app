@@ -10,13 +10,13 @@ https://resume-builder-frontend-gold-mu.vercel.app
 ## 📸 Screenshots
 
 ### Home Page
-(home.png)
+![Home Page](home.png)
 
 ### Resume Builder
-(builder.png)
+![Resume Builder](builder.png)
 
 ### Resume Preview
-(preview.png)
+![Preview](preview.png)
 
 ---
 
