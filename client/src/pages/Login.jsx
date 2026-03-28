@@ -57,9 +57,12 @@ const Login = () => {
                     <Lock size={13} color="#6B7280"/>
                     <input type="password" name="password" placeholder="Password" className="border-none outline-none ring-0" value={formData.password} onChange={handleChange} required />
                 </div>
-                <div className="mt-4 text-left text-green-500">
-                    <button className="text-sm" type="reset">Forget password?</button>
+                <div className="mt-4 text-left">
+                    <button type="button"onClick={() => setState("forgot")}className="text-sm text-green-500 hover:underline">
+                        Forgot password?
+                    </button>
                 </div>
+                
                 <button type="submit" className="mt-2 w-full h-11 rounded-full text-white bg-green-500 hover:opacity-90 transition-opacity">
                     {state === "login" ? "Login" : "Sign up"}
                 </button>
