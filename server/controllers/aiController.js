@@ -1,20 +1,20 @@
 import Resume from "../models/Resume.js";
 import ai from "../configs/ai.js";
 
-//controller for enhancing resume's professional summary
-//POST: /api/ai/enhance-pro-sum
-
+// POST: /api/ai/enhance-pro-sum
 export const enhanceProfessionalSummary = async (req, res) => {
   try {
     const { userContent } = req.body;
 
     if (!userContent) {
-      return res.status(400).json({ message: "Missing required fields" });
+      return res.status(400).json({
+        message: "Missing required fields"
+      });
     }
 
-    const response = await ai.responses.create({
-      model: "gpt-5-nano",
-      input: `You are an expert resume writer.
+    const response = await ai.models.generateContent({
+      model:  "gemini-2.5-flash",
+      contents: `You are an expert resume writer.
 
 Enhance the following professional summary in 1-2 sentences.
 Highlight key skills, experience, and career objectives.
@@ -24,64 +24,101 @@ Professional Summary:
 ${userContent}`
     });
 
-    const enhancedContent = response.output_text;
+    const enhancedContent = response.text;
 
-    return res.status(200).json({ enhancedContent });
+    return res.status(200).json({
+      enhancedContent
+    });
 
   } catch (error) {
-    console.log("FULL ERROR:", error);
-    return res.status(500).json({ message: error.message });
+    console.error("Gemini Error:", error);
+
+    return res.status(500).json({
+      message: error.message
+    });
   }
 };
 
-//controller for enhancing resume's job description
-//POST: /api/ai/enhance-job-decs
 
+// POST: /api/ai/enhance-job-desc
+// POST: /api/ai/enhance-job-desc
 export const enhanceJobDescription = async (req, res) => {
   try {
     const { userContent } = req.body;
 
-    if (!userContent) {
-      return res.status(400).json({ message: "Missing required fields" });
+    if (!userContent || !userContent.trim()) {
+      return res.status(400).json({
+        message: "Job description is required",
+      });
     }
 
-    const response = await ai.responses.create({
-      model: "gpt-5-nano",
-      input: `You are an expert resume writer.
-Enhance this job description in 1-2 sentences.
-Highlight key responsibilities and achievements.
-Use action verbs and make it ATS-friendly.
+    const prompt = `
+You are an expert professional resume writer.
 
-Job Description:
-${userContent}`
+Improve the following job description for a professional resume.
+
+Requirements:
+- Use strong action verbs.
+- Make it concise and professional.
+- Focus on responsibilities, contributions, and achievements.
+- Keep the original meaning.
+- Do not invent information, technologies, numbers, or achievements.
+- Make it ATS-friendly.
+- Return only the improved job description.
+- Do not add headings.
+- Do not add explanations.
+- Do not use quotation marks.
+- Keep it to 1-2 sentences.
+
+Job description:
+${userContent}
+`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
     });
 
-    const enhancedContent = response.output_text;
+    const enhancedContent = response.text?.trim();
 
-    return res.status(200).json({ enhancedContent });
+    if (!enhancedContent) {
+      return res.status(500).json({
+        message: "Gemini returned an empty response",
+      });
+    }
+
+    return res.status(200).json({
+      enhancedContent,
+    });
 
   } catch (error) {
-    console.log("FULL ERROR:", error);
-    return res.status(400).json({ message: error.message });
+    console.error("JOB DESCRIPTION GEMINI ERROR:", error);
+
+    return res.status(500).json({
+      message: error.message || "Failed to enhance job description",
+    });
   }
 };
-//controller for enhancing resume to the database
-//POST: /api/ai/upload-resume
-
+// POST: /api/ai/upload-resume
 export const uploadResume = async (req, res) => {
-    try{
-        const {resumeText, title} = req.body;
-        const userId = req.userId;
+  try {
+    const { resumeText, title } = req.body;
+    const userId = req.userId;
 
-        if(!resumeText){
-            return res.status(400).json({message: 'Missing required fields'})
-        }
+    if (!resumeText) {
+      return res.status(400).json({
+        message: "Missing required fields"
+      });
+    }
 
-        const systemPrompt = "You are an expert AI Agent to extract data from resume."
+    const systemPrompt =
+      "You are an expert AI Agent to extract data from resume.";
 
-        const userPrompt = `extract data from this resume: ${resumeText}
-        
-        Provide data in the following JSON format with no additional text before or after:
+    const userPrompt = `Extract data from this resume:
+
+${resumeText}
+
+Provide data in the following JSON format with no additional text before or after:
 
 {
   "professional_summary": "",
@@ -121,62 +158,74 @@ export const uploadResume = async (req, res) => {
       "graduation_date": "",
       "gpa": ""
     }
-        ],
-        }`;
+  ]
+}`;
 
-        console.log("Upload Resume Body:", req.body);
+    console.log("Upload Resume Body:", req.body);
 
-        const response = await ai.responses.create({
-          model: "gpt-5-nano",
-          input: `${systemPrompt}\n\n${userPrompt}`,
-          text: {
-            format: {
-              type: "json_object"
-            }
-          }
-        });
+    const response = await ai.models.generateContent({
+      model:  "gemini-2.5-flash",
+      contents: `${systemPrompt}\n\n${userPrompt}`,
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
 
-        console.log("OpenAI response received");
+    console.log("Gemini response received");
 
-        const extractedData = response.output_text;
+    const extractedData = response.text;
 
-        let parseData;
+    let parseData;
 
-        try {
-            parseData = JSON.parse(extractedData);
-        } catch (err) {
-            console.log("JSON Parse Error:", extractedData);
-            return res.status(500).json({ message: "AI returned invalid JSON" });
-        }
-        // Fix skills if AI returns string instead of array
-        if (typeof parseData.skills === "string") {
-        try {
-            parseData.skills = JSON.parse(parseData.skills);
-        } catch {
-            parseData.skills = [];
-        }
+    try {
+      parseData = JSON.parse(extractedData);
+    } catch (err) {
+      console.log("JSON Parse Error:", extractedData);
+
+      return res.status(500).json({
+        message: "AI returned invalid JSON"
+      });
+    }
+
+    // Fix skills if AI returns string instead of array
+    if (typeof parseData.skills === "string") {
+      try {
+        parseData.skills = JSON.parse(parseData.skills);
+      } catch {
+        parseData.skills = [];
+      }
     }
 
     // Convert objects → strings
     if (Array.isArray(parseData.skills)) {
-        parseData.skills = parseData.skills.map(skill => {
-            if (typeof skill === "string") return skill;
-            if (typeof skill === "object" && skill.type) return skill.type;
-            return "";
-        }).filter(Boolean);
+      parseData.skills = parseData.skills
+        .map(skill => {
+          if (typeof skill === "string") return skill;
+
+          if (typeof skill === "object" && skill.type) {
+            return skill.type;
+          }
+
+          return "";
+        })
+        .filter(Boolean);
     }
 
     const newResume = await Resume.create({
-        userId,
-        title,
-        ...parseData
+      userId,
+      title,
+      ...parseData
     });
 
-    res.json({ resumeId: newResume._id });
+    return res.status(200).json({
+      resumeId: newResume._id
+    });
 
-    }catch (error){
-        console.log("FULL ERROR:", error);
-        return res.status(500).json({message: error.message})
-    }
-    
-}
+  } catch (error) {
+    console.error("Gemini Error:", error);
+
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+};
